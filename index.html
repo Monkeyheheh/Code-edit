@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access-server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .tabs {
+            display: flex;
+            background: linear-gradient(to right, gray, black);
+            border-bottom: 2px solid #ccc;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+            background: linear-gradient(to bottom, gray, black);
+        }
+        .tab.active {
+            background: linear-gradient(to right, black, gray);
+            border-bottom: 3px solid #333;
+        }
+        .editor-container, .output-container {
+            flex: 1;
+            display: none;
+            padding: 10px;
+        }
+        .editor-container.active, .output-container.active {
+            display: flex;
+            flex-direction: column;
+        }
+        #editor-html, #editor-css, #editor-js {
+            height: 82vh;
+            width: 100%;
+        }
+        #output-frame {
+            height: 100vh;
+            width: 100%;
+            border: none;
+        }
+        button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(to right, black, gray);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <div class="tab active" onclick="openTab('html')">HTML</div>
+        <div class="tab" onclick="openTab('css')">CSS</div>
+        <div class="tab" onclick="openTab('js')">JavaScript</div>
+        <div class="tab" onclick="openTab('output')">Output</div>
+    </div>
+
+    <div id="html" class="editor-container active">
+        <div id="editor-html"><!-- Write your HTML here --></div>
+    </div>
+    <div id="css" class="editor-container">
+        <div id="editor-css">/* Write your CSS here */</div>
+    </div>
+    <div id="js" class="editor-container">
+        <div id="editor-js">// Write your JavaScript here</div>
+    </div>
+    <div id="output" class="output-container">
+        <iframe id="output-frame"></iframe>
+    </div>
+
+    <button onclick="runCode()">Run</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script>
+        // Initialize Ace Editors
+        var editorHtml = ace.edit("editor-html");
+        editorHtml.setTheme("ace/theme/monokai");
+        editorHtml.session.setMode("ace/mode/html");
+
+        var editorCss = ace.edit("editor-css");
+        editorCss.setTheme("ace/theme/monokai");
+        editorCss.session.setMode("ace/mode/css");
+
+        var editorJs = ace.edit("editor-js");
+        editorJs.setTheme("ace/theme/monokai");
+        editorJs.session.setMode("ace/mode/javascript");
+
+        // Function to switch between tabs
+        function openTab(tabName) {
+            var tabs = document.querySelectorAll('.tab');
+            var containers = document.querySelectorAll('.editor-container, .output-container');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            containers.forEach(container => container.classList.remove('active'));
+            document.querySelector('.tab[onclick="openTab(\'' + tabName + '\')"]').classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Function to run the code and display output
+        function runCode() {
+            var html = editorHtml.getValue();
+            var css = "<style>" + editorCss.getValue() + "</style>";
+            var js = "<script>" + editorJs.getValue() + "<\/script>";
+            var code = html + css + js;
+
+            var outputFrame = document.getElementById("output-frame").contentWindow.document;
+            outputFrame.open();
+            outputFrame.write(code);
+            outputFrame.close();
+
+            // Switch to the Output tab
+            openTab('output');
+        }
+    </script>
+</body>
+</html>
